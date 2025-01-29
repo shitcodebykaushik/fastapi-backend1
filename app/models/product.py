@@ -14,3 +14,4 @@ class Product(Base):
 
     farmer = relationship("User", back_populates="products")
     bids = relationship("Bid", back_populates="product", cascade="all, delete")
+    orders = relationship("Order", back_populates="product", cascade="all, delete")

@@ -14,3 +14,4 @@ class Bid(Base):
 
     product = relationship("Product", back_populates="bids")
     buyer = relationship("User", back_populates="bids")
+    order = relationship("Order", uselist=False, back_populates="bid")  # Link order

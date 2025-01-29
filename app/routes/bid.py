@@ -4,6 +4,7 @@ from app.db.database import engine
 from app.models.bid import Bid
 from app.models.user import User
 from app.models.product import Product
+from app.models.notification import Notification
 from app.schemas.bid import BidCreate, BidResponse
 from app.utils.auth import get_current_user, require_role
 
@@ -32,6 +33,14 @@ def place_bid(
         price_per_kg=bid.price_per_kg
     )
     db.add(new_bid)
+
+    # ✅ Create Notification for Farmer
+    notification = Notification(
+        user_id=product.farmer_id,
+        message=f"New bid placed on {product.name} by {current_user.full_name}."
+    )
+    db.add(notification)
+
     db.commit()
     db.refresh(new_bid)
     return new_bid
@@ -61,6 +70,14 @@ def update_bid_status(
         raise HTTPException(status_code=400, detail="Invalid status")
 
     bid.status = status
+
+    # ✅ Create Notification for Buyer
+    notification = Notification(
+        user_id=bid.buyer_id,
+        message=f"Your bid on {bid.product.name} was {status} by {current_user.full_name}."
+    )
+    db.add(notification)
+
     db.commit()
     db.refresh(bid)
     return bid

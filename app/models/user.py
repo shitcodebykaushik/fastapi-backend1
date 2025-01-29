@@ -14,3 +14,4 @@ class User(Base):
 
     products = relationship("Product", back_populates="farmer", cascade="all, delete")
     bids = relationship("Bid", back_populates="buyer", cascade="all, delete")
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete")
