@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String
-from app.db.database import metadata, engine
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from sqlalchemy.orm import relationship
+from app.db.database import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -14,5 +12,5 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)  # Either "farmer" or "buyer"
 
-# Create the database tables
-Base.metadata.create_all(bind=engine)
+    products = relationship("Product", back_populates="farmer", cascade="all, delete")
+    bids = relationship("Bid", back_populates="buyer", cascade="all, delete")

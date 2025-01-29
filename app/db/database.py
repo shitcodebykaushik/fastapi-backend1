@@ -1,12 +1,16 @@
-from sqlalchemy import create_engine, MetaData
-from databases import Database
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# SQLite Database URL
-DATABASE_URL = "sqlite:///./backend.db"
+DATABASE_URL = "sqlite:///./backend.db"  # SQLite Database
 
-# Async Database Connection
-database = Database(DATABASE_URL)
-
-# SQLAlchemy Engine
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-metadata = MetaData()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Ensure all models are created
+def init_db():
+    from app.models import user, product,bid  # Import models before table creation
+    Base.metadata.create_all(bind=engine)
+
+init_db()  # Run this to create tables
