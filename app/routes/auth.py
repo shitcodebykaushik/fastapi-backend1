@@ -16,7 +16,7 @@ def get_db():
     with Session(engine) as session:
         yield session
 
-# User Signup API
+# ✅ User Signup API
 @router.post("/signup", response_model=UserResponse)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter((User.email == user.email) | (User.phone == user.phone)).first()
@@ -36,7 +36,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-# User Login API
+# ✅ User Login API (Fixed)
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
@@ -46,9 +46,19 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     access_token = create_access_token(data={"sub": user.email}, expires_delta=timedelta(minutes=30))
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "full_name": user.full_name,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role
+        }
+    }
 
-# Get the current logged-in user (Protected route)
+# ✅ Get the current logged-in user (Protected route)
 @router.get("/me", response_model=UserResponse)
 def get_logged_in_user(current_user=Depends(get_current_user)):
     return current_user
